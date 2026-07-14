@@ -1,0 +1,24 @@
+services:
+  app:
+    image: python:3.9-alpine
+    command: tail -f /dev/null
+    profiles: [dev, test, prod]
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_PASSWORD: password
+    profiles: [dev, test, prod]
+
+  adminer:
+    image: adminer:latest
+    profiles: [dev, test]
+
+  cache:
+    image: redis:alpine
+    profiles: [dev, prod]
+
+  test-runner:
+    image: alpine:latest
+    command: tail -f /dev/null
+    profiles: [test]

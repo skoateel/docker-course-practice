@@ -1,0 +1,25 @@
+services:
+  web:
+    image: nginx:alpine
+    networks:
+      - frontend_network
+
+  api:
+    image: alpine
+    command: tail -f /dev/null
+    networks:
+      - backend_network
+      - frontend_network
+
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: password
+    networks:
+      - backend_network
+
+networks:
+  frontend_network:
+    driver: bridge
+  backend_network:
+    driver: bridge

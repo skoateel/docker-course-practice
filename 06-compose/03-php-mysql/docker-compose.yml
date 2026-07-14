@@ -1,0 +1,26 @@
+services:
+  web:
+    image: php:7.4-apache
+    container_name: php-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html
+    command: >
+      bash -c "docker-php-ext-install mysqli && apache2-foreground"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: devuser
+      MYSQL_PASSWORD: devpass
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
