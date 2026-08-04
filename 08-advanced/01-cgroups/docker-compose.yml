@@ -1,0 +1,59 @@
+services:
+  api-service:
+    image: nginx:alpine
+    container_name: api-service
+    ports:
+      - "8001:80"
+    cpus: 1.0
+    mem_limit: 512M
+    networks:
+      - resource-test-net
+
+  data-processor:
+    image: python:3.9-slim
+    container_name: data-processor
+    command: python stress_cpu.py
+    volumes:
+      - ./stress_cpu.py:/app/stress_cpu.py
+    working_dir: /app
+    cpus: 0.5
+    mem_limit: 256M
+    networks:
+      - resource-test-net
+
+  background-service:
+    image: python:3.9-slim
+    container_name: background-service
+    command: python stress_cpu.py
+    volumes:
+      - ./stress_cpu.py:/app/stress_cpu.py
+    working_dir: /app
+    cpu_shares: 256
+    mem_limit: 128M
+    networks:
+      - resource-test-net
+
+  limited-db:
+    image: postgres:13-alpine
+    container_name: limited-db
+    environment:
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    blkio_config:
+      device_read_bps:
+        - path: /dev/sda
+          rate: '20mb'
+      device_write_bps:
+        - path: /dev/sda
+          rate: '10mb'
+    networks:
+      - resource-test-net
+
+volumes:
+  db-data:
+
+networks:
+  resource-test-net:
