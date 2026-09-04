@@ -1,0 +1,30 @@
+groups:
+- name: container_alerts
+  rules:
+  - alert: ContainerCpuUsageHigh
+    expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) by (name) * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container CPU usage high (instance {{ $labels.instance }})"
+      description: "Container {{ $labels.name }} CPU usage is above 80% for 5 minutes\n  VALUE = {{ $value }}%"
+
+  - alert: ContainerMemoryUsageHigh
+    expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} * 100) > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Container memory usage high (instance {{ $labels.instance }})"
+      description: "Container {{ $labels.name }} memory usage is above 80% for 5 minutes\n  VALUE = {{ $value }}%"
+
+  - alert: ContainerNearMemoryLimit
+    expr: (container_memory_usage_bytes{name!=""} / container_spec_memory_limit_bytes{name!=""} * 100) > 95
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Container near memory limit (instance {{ $labels.instance }})"
+      description: "Container {{ $labels.name }} is using more than 95% of its memory limit for 5 minutes\n  VALUE = {{ $value }}%"
+
