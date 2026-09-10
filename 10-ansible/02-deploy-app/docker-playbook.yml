@@ -1,0 +1,34 @@
+---
+- name: Установка Docker и запуск веб-сервера
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Обновить кэш apt
+      apt:
+        update_cache: yes
+
+    - name: Установить Docker и pip3
+      apt:
+        name:
+          - docker.io
+          - python3-pip
+          - python3-docker
+        state: present
+
+    - name: Добавить пользователя в группу docker
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Сбросить соединение (чтобы группа docker применилась)
+      meta: reset_connection
+
+    - name: Запустить веб-сервер в контейнере
+      docker_container:
+        name: web
+        image: nginx:alpine
+        state: started
+        ports:
+          - "8080:80"
