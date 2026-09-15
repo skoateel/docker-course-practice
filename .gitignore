@@ -12,3 +12,6 @@
 node_modules/
 build/
 dist/
+
+# Исключение: .env финального проекта требуется по условиям сдачи ТЗ
+!11-final-project/.env
